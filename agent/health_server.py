@@ -30,4 +30,4 @@ def run_health_server():
     port = int(os.environ.get('PORT', 8080))
     server = HTTPServer(('', port), HealthHandler)
     print(f"Health check server listening on port {port}")
-    server.serve_forever() 
+    server.serve_forever()
