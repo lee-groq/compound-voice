@@ -256,7 +256,7 @@ class CustomGroqLLM(LLM):
 class CustomGroqLLMStream(LLMStream):
     """
     Custom stream implementation for our Groq LLM. A workaround so that our custom LLM can integrate with LiveKit.
-    TODO: Use Compound-beta's native stream implementation instead.
+    TODO: Use compound-beta's native stream implementation instead.
     """
     
     def __init__(self, llm: LLM, chat_ctx: ChatContext, fnc_ctx: Optional[Any], 
@@ -360,12 +360,17 @@ async def entrypoint(ctx: JobContext):
 
         # Connect to the room
         await ctx.connect()
-
-        # Wait a moment for participants to join and metadata to be available
-        # await asyncio.sleep(0.5)
         
         # Send initial greeting using say() instead of generate_reply()
         await session.say("Hi, how can I help you today?")
+
+        # Notify frontend that agent greeting is finished
+        await ctx.room.local_participant.publish_data(
+            payload=json.dumps({
+                "type": "agent_greeting_finished",
+            }).encode('utf-8')
+        )
+        print("[DEBUG] Sent agent_greeting_finished message to frontend")
         
     except Exception as e:
         print(f"Fatal error in entrypoint: {e}")

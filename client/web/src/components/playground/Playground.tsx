@@ -6,6 +6,7 @@ import { GroqAudioVisualizer } from "../visualization/GroqAudioVisualizer";
 import { useMultibandTrackVolume } from "@/hooks/useTrackVolume";
 import {
   useConnectionState,
+  useDataChannel,
   useLocalParticipant,
   useRemoteParticipants,
   useTracks,
@@ -66,6 +67,7 @@ export default function Playground({ onConnect }: PlaygroundProps) {
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [isApiKeyLoading, setIsApiKeyLoading] = useState(false);
   const [apiKeyError, setApiKeyError] = useState<string | null>(null);
+  const [agentGreetingFinished, setAgentGreetingFinished] = useState(false);
   
   const agentParticipant = participants.find((p) => p.isAgent);
 
@@ -79,9 +81,24 @@ export default function Playground({ onConnect }: PlaygroundProps) {
   useEffect(() => {
     if (roomState === ConnectionState.Connected) {
       localParticipant.setMicrophoneEnabled(true);
+    } else if (roomState === ConnectionState.Disconnected) {
+      setAgentGreetingFinished(false);
     }
   }, [localParticipant, roomState]);
   
+  useDataChannel((message) => {
+    if (message.from && message.from.isAgent) {
+      try {
+        const data = JSON.parse(new TextDecoder().decode(message.payload));
+        if (data.type === "agent_greeting_finished") {
+          setAgentGreetingFinished(true);
+        }
+      } catch (error) {
+        console.error("Failed to parse data message from agent", error);
+      }
+    }
+  });
+
   const handleApiKeySubmit = async (key: string) => {
     setIsApiKeyLoading(true);
     setApiKeyError(null);
@@ -305,7 +322,7 @@ export default function Playground({ onConnect }: PlaygroundProps) {
         
         {/* Suggested Prompts Section - Only show when connected */}
         <AnimatePresence>
-          {roomState === ConnectionState.Connected && (
+          {roomState === ConnectionState.Connected && agentGreetingFinished && (
             <motion.div
               className="mb-4 w-full max-w-2xl px-4"
               initial={{
@@ -359,7 +376,7 @@ export default function Playground({ onConnect }: PlaygroundProps) {
             {roomState === ConnectionState.Disconnected && apiKey && !agentAudioTrack ? startConversationButton : null}
           </AnimatePresence>
           <AnimatePresence>
-            {roomState === ConnectionState.Connected ? conversationToolbar : null}
+            {roomState === ConnectionState.Connected && agentGreetingFinished ? conversationToolbar : null}
           </AnimatePresence>
         </div>
       </div>
@@ -375,7 +392,8 @@ export default function Playground({ onConnect }: PlaygroundProps) {
     onConnect,
     apiKey,
     isApiKeyLoading,
-    apiKeyError
+    apiKeyError,
+    agentGreetingFinished,
   ]);
 
   return (
