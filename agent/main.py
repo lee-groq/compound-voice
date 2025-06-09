@@ -33,8 +33,11 @@ async def get_api_key_from_participants(ctx: JobContext):
     """
     if not ctx.room:
         return None
+    
+    # Wait a moment for participants to fully connect and metadata to be available
+    # await asyncio.sleep(0.5)
         
-    # Check current participants first
+    # Check current participants
     all_participants = list(ctx.room.remote_participants.values())
     if ctx.room.local_participant:
         all_participants.append(ctx.room.local_participant)
@@ -49,6 +52,7 @@ async def get_api_key_from_participants(ctx: JobContext):
             except (json.JSONDecodeError, AttributeError) as e:
                 print(f"Error parsing participant metadata: {e}")
     
+    print("[DEBUG] No GROQ_API_KEY found in any participant metadata")
     return None
 
 
@@ -323,8 +327,11 @@ async def entrypoint(ctx: JobContext):
     try:
         # Try to get API key from environment first
         retrieved_groq_api_key = get_api_key_from_env()
-                
-        # If no API key from env, try to get from participant metadata
+        
+        # Connect to the room first so we can access participant metadata
+        await ctx.connect()
+        
+        # If no API key from env, try to get from participant metadata (now that we're connected)
         if not retrieved_groq_api_key:
             retrieved_groq_api_key = await get_api_key_from_participants(ctx)
         
@@ -357,9 +364,6 @@ async def entrypoint(ctx: JobContext):
                 
         # Start the session with the agent
         await session.start(agent=GroqAgent(), room=ctx.room)
-
-        # Connect to the room
-        await ctx.connect()
         
         # Send initial greeting using say() instead of generate_reply()
         await session.say("Hi, how can I help you today?")

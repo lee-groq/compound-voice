@@ -113,7 +113,24 @@ export default function Playground({ onConnect }: PlaygroundProps) {
         throw new Error("Invalid Groq API key format. It should start with 'gsk_'");
       }
       
-      console.log("API key validated and stored");
+      // Validate the API key by making a test call to Groq
+      const response = await fetch("https://api.groq.com/openai/v1/models", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${key.trim()}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("Invalid API key. Please check your Groq API key and try again.");
+        } else {
+          throw new Error(`API validation failed: ${response.status} ${response.statusText}`);
+        }
+      }
+      
+      console.log("API key validated successfully");
       setApiKey(key.trim());
     } catch (error) {
       console.error("Error validating API key:", error);
@@ -245,9 +262,9 @@ export default function Playground({ onConnect }: PlaygroundProps) {
     );
 
     const startConversationButton = (
-      <div className="fixed bottom-2 md:bottom-auto md:absolute left-1/2 md:top-1/2 -translate-y-1/2 -translate-x-1/2 w-11/12 md:w-auto text-center">
+      <div className="fixed bottom-2 md:bottom-auto md:absolute left-1/2 md:top-1/2 -translate-y-1/2 -translate-x-1/2 w-11/12 md:w-96 text-center">
         <motion.div
-          className="flex gap-3"
+          className="flex flex-col gap-3"
           initial={{
             opacity: 0,
             y: 50,
@@ -268,8 +285,9 @@ export default function Playground({ onConnect }: PlaygroundProps) {
         >
           <Button
               state="primary"
-              size="large"
-              className={`relative w-full text-base text-black ${isLoading ? "pointer-events-none" : ""}`}
+              size="medium"
+              className={`relative w-full text-base text-black ${!apiKey || isApiKeyLoading ? "opacity-70 cursor-not-allowed" : ""}`}
+              disabled={!apiKey || isApiKeyLoading}
               onClick={() => {
                 // Pass the API key when connecting
                 if (apiKey) {
@@ -282,13 +300,13 @@ export default function Playground({ onConnect }: PlaygroundProps) {
               }}
             >
             <div
-              className={`w-full ${isLoading ? "opacity-0" : "opacity-100"}`}
+              className={`w-full ${isApiKeyLoading ? "opacity-0" : "opacity-100"}`}
             >
-              Start your conversation
+              Start Your Conversation
             </div>
             <div
               className={`absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 ${
-                isLoading ? "opacity-100" : "opacity-0"
+                isApiKeyLoading ? "opacity-100" : "opacity-0"
               }`}
             >
               <LoadingSVG diameter={24} strokeWidth={4} />

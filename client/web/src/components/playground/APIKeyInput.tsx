@@ -21,7 +21,7 @@ export const APIKeyInput = ({ onApiKeySubmit, isLoading, apiError }: APIKeyInput
   }, [apiKey]);
 
   const handleSubmit = () => {
-    if (isValid) {
+    if (isValid && !isLoading) {
       onApiKeySubmit(apiKey);
     }
   };
@@ -30,7 +30,7 @@ export const APIKeyInput = ({ onApiKeySubmit, isLoading, apiError }: APIKeyInput
     <div className="w-full flex flex-col gap-3">
       <div className="flex flex-col gap-1">
         <label htmlFor="api-key" className="text-sm text-gray-600">
-          Groq API Key
+          Groq API Key (gsk_yA...)
         </label>
         <div className="relative">
           <input
@@ -39,12 +39,18 @@ export const APIKeyInput = ({ onApiKeySubmit, isLoading, apiError }: APIKeyInput
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
             placeholder="Enter your Groq API key"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cartesia-500 pr-10"
+            disabled={isLoading}
+            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cartesia-500 pr-10 ${
+              isLoading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           />
           <button
             type="button"
             onClick={() => setShowKey(!showKey)}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+            disabled={isLoading}
+            className={`absolute inset-y-0 right-0 pr-3 flex items-center ${
+              isLoading ? "text-gray-300 cursor-not-allowed" : "text-gray-400 hover:text-gray-600"
+            }`}
           >
             {showKey ? (
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">

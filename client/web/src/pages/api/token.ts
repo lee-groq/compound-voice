@@ -29,11 +29,20 @@ export default async function handleToken(
   res: NextApiResponse
 ) {
   try {
+    // Only allow POST requests for security
+    if (req.method !== "POST") {
+      res.setHeader("Allow", ["POST"]);
+      res.status(405).json({ error: "Method not allowed" });
+      return;
+    }
+
     if (!apiKey || !apiSecret) {
       res.statusMessage = "Environment variables aren't set up correctly";
       res.status(500).end();
       return;
     }
+
+    const requestBody = req.body || {};
 
     const roomName = `groq-toq-${generateRandomAlphanumeric(
       4
@@ -54,17 +63,17 @@ export default async function handleToken(
       identity,
     };
     
-    // Build metadata object
+    // Build metadata object from request body
     const metadata: { [key: string]: string } = {};
     
-    const ciApiKey = req.query.ci_api_key;
+    const ciApiKey = requestBody.ci_api_key;
     if (ciApiKey !== undefined) {
-      metadata.ci_api_key = ciApiKey as string;
+      metadata.ci_api_key = ciApiKey;
     }
     
-    const groqApiKey = req.query.groq_api_key;
+    const groqApiKey = requestBody.groq_api_key;
     if (groqApiKey !== undefined) {
-      metadata.groq_api_key = groqApiKey as string;
+      metadata.groq_api_key = groqApiKey;
     }
     
     // Only set metadata if we have any

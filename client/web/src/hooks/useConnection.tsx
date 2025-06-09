@@ -36,25 +36,37 @@ export const ConnectionProvider = ({
     if (!process.env.NEXT_PUBLIC_LIVEKIT_URL) {
       throw new Error("NEXT_PUBLIC_LIVEKIT_URL is not set");
     }
-    let tokenUrl = "/api/token";
-    const params = new URLSearchParams();
+    
+    // Prepare request body with API keys and metadata
+    const requestBody: { [key: string]: string } = {};
     
     if ("ci_api_key" in config && config.ci_api_key) {
-      params.append("ci_api_key", config.ci_api_key);
+      requestBody.ci_api_key = config.ci_api_key;
     }
     
-    // Add metadata to the token request
+    // Add metadata to the request body
     if (metadata) {
       Object.entries(metadata).forEach(([key, value]) => {
-        params.append(key, value);
+        requestBody[key] = value;
       });
     }
     
-    if (params.toString()) {
-      tokenUrl += `?${params.toString()}`;
+    // Send POST request with API keys in body instead of URL
+    const response = await fetch("/api/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
     }
     
-    const { accessToken } = await fetch(tokenUrl).then((res) => res.json());
+    const { accessToken } = await response.json();
+    
     setConnectionDetails({
       wsUrl: process.env.NEXT_PUBLIC_LIVEKIT_URL,
       token: accessToken,
