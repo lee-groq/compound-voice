@@ -1,11 +1,10 @@
 "use client";
 
-import { useCloud } from "@/cloud/useCloud";
 import React, { createContext, useState } from "react";
 import { useCallback } from "react";
 import { useConfig } from "./useConfig";
 
-export type ConnectionMode = "cloud" | "manual" | "env";
+export type ConnectionMode = "manual" | "env";
 
 type TokenGeneratorData = {
   shouldConnect: boolean;
