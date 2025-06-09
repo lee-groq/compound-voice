@@ -1,0 +1,5 @@
+livekit-agents>=1.0.0
+livekit-plugins-silero>=1.0.0
+livekit-plugins-groq>=1.0.0
+python-dotenv
+groq
