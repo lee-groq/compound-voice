@@ -170,7 +170,7 @@ class CustomGroqLLM(LLM):
                     response = self.llm._client.chat.completions.create(
                         messages=messages,
                         model=self.llm.model,
-                        stream=False
+                        stream=False,  # TODO: Change to True, update LLMStream to use compound-beta's native stream
                     )
                     
                     if hasattr(response, 'id') and response.id:
