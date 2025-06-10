@@ -54,8 +54,6 @@ coverage.xml
 .pytest_cache/
 cover/
 
-*.txt
-
 # Translations
 *.mo
 *.pot
