@@ -1,22 +1,38 @@
-# Groq demo with LiveKit Agents
+# Compound Voice
 
-This project demonstrates a voice-enabled AI assistant using Groq, LiveKit, and a voice-based interface for kitchen chef interactions.
+A compound AI voice assistant using [Compound-beta](https://console.groq.com/docs/agentic-tooling/compound-beta) on Groq and LiveKit, equipped with internet search tool use capabilities.
 
-Prerequisites
+
+## Quickstart
+
+### Hosted on Google Cloud:
+To use Compound Voice, you can use the hosted version at **INSERT LINK HERE**
+
+### Run locally:
+Alternatively, you can run Compound Voice locally. 
+
+
+#### Prerequisites
 - Python 3.12
 - pnpm (for frontend)
-- API keys from Groq & Livekit
+- API keys from Groq and LiveKit
+- (Optional, if hosting on GCP) GCP project ID
 
-Environment setup:
 
+#### Step 1
 Create a .env file in the agent/ directory with the following variables:
 ```
-LIVEKIT_URL=XXXXXX
-LIVEKIT_API_KEY=XXXXXX
-LIVEKIT_API_SECRET=XXXXXX
-GROQ_API_KEY=XXXXXX
-```
+LIVEKIT_URL=YOUR_LIVEKIT_URL
+LIVEKIT_API_KEY=YOUR_LIVEKIT_API_KEY
+LIVEKIT_API_SECRET=YOUR_LIVEKIT_API_SECRET
 
+# Optional for local development
+GROQ_API_KEY=YOUR_GROQ_API_KEY
+
+# If hosting on GCP
+GCP_PROJECT_ID=YOUR_GCP_PROJECT_ID
+```
+#### Step 2
 Create a .env.local file in the client/web/ directory with:
 ```
 # LiveKit API Configuration
@@ -24,118 +40,74 @@ LIVEKIT_API_KEY=YOUR_API_KEY
 LIVEKIT_API_SECRET=YOUR_API_SECRET
 
 # Public configuration
-LIVEKIT_URL=wss://YOUR_LIVEKIT_URL
+NEXT_PUBLIC_LIVEKIT_URL=wss://YOUR_LIVEKIT_URL
+
+# If hosting on GCP
+GCP_PROJECT_ID=YOUR_GCP_PROJECT_ID
+```  
+
+#### Step 3
+To set up the backend agent, navigate to the agent directory:
+```bash
+cd agent
+```
+Create and activate a virtual environment:
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows, use `.venv\Scripts\activate`
+```
+Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+Run the agent:
+```bash
+python main.py dev
+# or: python main.py console
 ```
 
-Valid API keys for Groq and other services
-
-# Code
-
-## Installation and Running the Project
-
-### Backend Setup (Agent)
-
-1. Navigate to the agent directory:
-   ```bash
-   cd agent
-   ```
-
-2. Create and activate a virtual environment:
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows, use `.venv\Scripts\activate`
-   ```
-
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. Run the agent:
-   ```bash
-   python main.py dev
-   ```
-
-- It'll be on port 5001 because on Mac port 5000 is taken already
-
-### Frontend Setup (Web Client)
-
-1. Navigate to the web client directory:
-   ```bash
-   cd client/web
-   ```
-
-2. Install dependencies:
-   ```bash
-   pnpm install
-   ```
-
-3. Start the development server:
-   ```bash
-   pnpm dev
-   ```
-
-## Accessing the Application
-
-Open a web browser and navigate to:
-- `http://localhost:3000`
-
-
-# Python Backend Code Walkthrough:
-Takes place in `main.py`
-
-### Import the required packages
+#### Step 4
+To set up the frontend, navigate to the web client directory:
+```bash
+cd client/web
 ```
-from livekit.agents import JobContext, WorkerOptions, cli, JobProcess, AutoSubscribe
-from livekit.agents.llm import (
-    ChatContext,
-    ChatMessage,
-)
-from livekit.agents.voice_assistant import VoiceAssistant
-from livekit.plugins import silero, groq
-
-from dotenv import load_dotenv
-
-load_dotenv()
+Install dependencies:
+```bash
+pnpm install
+```
+Start the development server:
+```bash
+pnpm dev
 ```
 
-### Setup the System Prompt & Choose the Speech-in, LLM, and Speech-out models
+#### Step 5
+To access the app, open a web browser and navigate to:
+`http://localhost:3000`
+
+> *Why is there no backend server that connects to the frontend?*   
+LiveKit agents don't expose their own HTTP ports or URLs locally. Everything is handled by its outbound connections with the LiveKit server. The frontend link is all you need!
+
+## Deployment
+
+Create one GCP service for the agent and one GCP service for the frontend. Then, build and push the Docker images:
+
+```bash
+cd agent  
+docker build -t us-west1-docker.pkg.dev/<YOUR_GCP_PROJECT_ID>/<YOUR_GCP_REPOSITORY>/<YOUR_AGENT_SERVICE_NAME>:latest -f agent/Dockerfile.agent --platform linux/amd64 ./agent
+
+docker push us-west1-docker.pkg.dev/<YOUR_GCP_PROJECT_ID>/<YOUR_GCP_REPOSITORY>/<YOUR_AGENT_SERVICE_NAME>:latest
+```
+```bash
+cd client/web
+docker build --build-arg NEXT_PUBLIC_LIVEKIT_URL=wss://your-livekit-url.com -t us-west1-docker.pkg.dev/<YOUR_GCP_PROJECT_ID>/<YOUR_GCP_REPOSITORY>/<YOUR_FRONTEND_SERVICE_NAME>:latest -f client/web/Dockerfile --platform linux/amd64 ./client/web
+
+docker push us-west1-docker.pkg.dev/<YOUR_GCP_PROJECT_ID>/<YOUR_GCP_REPOSITORY>/<YOUR_FRONTEND_SERVICE_NAME>:latest
 ```
 
-def prewarm(proc: JobProcess):
-    proc.userdata["vad"] = silero.VAD.load()
+## Contributing
+Improvements through PRs are welcome!
 
+## Changelog
 
-async def entrypoint(ctx: JobContext):
-    await ctx.connect(auto_subscribe=AutoSubscribe.AUDIO_ONLY)
-
-    initial_ctx = ChatContext(
-        messages=[
-            ChatMessage(
-                role="system",
-                content="You are an assistant that answers kitchen chef questions. Be nice. Respond in full words and plain text, without styling words or special characters.",
-            )
-        ]
-    )
-
-    assistant = VoiceAssistant(
-        vad=ctx.proc.userdata["vad"],
-        stt=groq.STT(), # uses whisper
-        llm=groq.LLM(
-            model="llama3-8b-8192",
-            # tool_choice="" # optional tool calling
-        ),
-        tts=groq.TTS(
-            voice="Chip-PlayAI", # see all voices here: https://console.groq.com/playground?model=playai-tts
-        ),
-        chat_ctx=initial_ctx,
-    )
-
-    assistant.start(ctx.room)
-    await assistant.say("Hi there, how are you doing today?", allow_interruptions=True)
-
-
-if __name__ == "__main__":
-    cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint, prewarm_fnc=prewarm))
-
-```
+## Future Features
+- Improved animations for the title card and AI agent (indicate loading state)
