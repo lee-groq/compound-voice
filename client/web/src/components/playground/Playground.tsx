@@ -253,10 +253,7 @@ export default function Playground({ onConnect }: PlaygroundProps) {
           <div className="text-center text-base text-gray-700 mb-2">
             Please enter your Groq API key to continue
           </div>
-          <APIKeyInput onApiKeySubmit={handleApiKeySubmit} isLoading={isApiKeyLoading} />
-          {apiKeyError && (
-            <div className="text-red-500 text-sm mt-1">{apiKeyError}</div>
-          )}
+          <APIKeyInput onApiKeySubmit={handleApiKeySubmit} isLoading={isApiKeyLoading} apiError={apiKeyError} />
         </motion.div>
       </div>
     );
@@ -318,6 +315,19 @@ export default function Playground({ onConnect }: PlaygroundProps) {
 
     const visualizerContent = (
       <div className="flex flex-col items-center justify-space-between w-full pb-12">
+        {roomState === ConnectionState.Disconnected && (
+          <div className="w-full text-center mb-4 px-4">
+            <div className="inline-block text-left">
+              <p className="text-sm text-gray-500">
+                Project:
+              </p>
+              <h1 className="text-5xl font-bold my-1">Compound Voice</h1>
+              <p className="text-sm text-gray-500">
+                a <a href="https://console.groq.com/docs/agentic-tooling/compound-beta" target="_blank" className="text-groq-button-text hover:text-groq-accent-text-active">Compound-beta</a> based voice assistant, powered by Groq
+              </p>
+            </div>
+          </div>
+        )}
         <div className="flex items-center">
           <GroqAudioVisualizer
             state={

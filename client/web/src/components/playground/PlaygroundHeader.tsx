@@ -24,7 +24,7 @@ export const PlaygroundHeader = ({ height }: PlaygroundHeader) => {
           target="_blank"
           className="flex gap-2 items-center pb-8 hover:opacity-80 transition-all"
         >
-          <span className="text-base">Powered by</span>
+          <span className="text-base">Featuring</span>
           <img src="/livekit-logo.svg" width="72px" alt="LiveKit Logo" />
         </a>
       </div>
