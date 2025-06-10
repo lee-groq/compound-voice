@@ -28,9 +28,9 @@ export const APIKeyInput = ({ onApiKeySubmit, isLoading, apiError }: APIKeyInput
 
   return (
     <div className="w-full flex flex-col gap-3">
-      <div className="flex flex-col gap-1">
-        <label htmlFor="api-key" className="text-sm text-gray-600">
-          Groq API Key (gsk_yA...)
+      <div className="flex flex-col gap-1 mb-3">
+        <label htmlFor="api-key" className="text-sm text-gray-600 text-left">
+          Groq API Key
         </label>
         <div className="relative">
           <input
@@ -38,7 +38,7 @@ export const APIKeyInput = ({ onApiKeySubmit, isLoading, apiError }: APIKeyInput
             type={showKey ? "text" : "password"}
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
-            placeholder="Enter your Groq API key"
+            placeholder="gsk_..."
             disabled={isLoading}
             className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cartesia-500 pr-10 ${
               isLoading ? "opacity-50 cursor-not-allowed" : ""
@@ -69,11 +69,14 @@ export const APIKeyInput = ({ onApiKeySubmit, isLoading, apiError }: APIKeyInput
             {apiError}
           </div>
         )}
+                  <div className="text-xs text-gray-500 text-left">
+            Don&apos;t have an API key? <a href="https://console.groq.com/home" target="_blank" className="text-groq-button-text hover:text-groq-accent-text-active">Create one here</a>
+          </div>
       </div>
       <Button
         state="primary"
         size="medium"
-        className={`relative w-full text-base text-black ${!isValid || isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
+        className={`relative w-full text-base ${!isValid || isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
         disabled={!isValid || isLoading}
         onClick={handleSubmit}
       >
