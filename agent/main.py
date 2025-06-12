@@ -205,6 +205,10 @@ class CustomGroqLLM(LLM):
                     return self.stream
                     
                 except Exception as e:
+                    print("[FATAL] Groq API call failed. Dumping malformed messages payload:")
+                    import json
+                    print(json.dumps(messages, indent=2))
+
                     print(f"[DEBUG] Error in Groq API call: {e}")
                     traceback.print_exc()
                     self.stream = CustomGroqLLMStream(
@@ -213,7 +217,7 @@ class CustomGroqLLM(LLM):
                         fnc_ctx=self.fnc_ctx,
                         conn_options=self.conn_ctx,
                         request_id=request_id,
-                        content="I apologize, but I encountered an error processing your request.",
+                        content="I apologize, but I encountered an error processing your request. Please reconnect to the chat room and try again.",
                         executed_tools=None,
                         tools=self.tools
                     )
