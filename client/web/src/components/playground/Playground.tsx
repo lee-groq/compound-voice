@@ -168,7 +168,7 @@ export default function Playground({ onConnect }: PlaygroundProps) {
   const audioTileContent = useMemo(() => {
     const conversationToolbar = (
       <div
-        className="fixed z-50 md:absolute left-1/2 bottom-4 md:bottom-auto md:top-1/2 -translate-y-1/2 -translate-x-1/2"
+        className="relative z-50 flex justify-center mt-6"
         style={{
           filter: "drop-shadow(0 8px 10px rgba(0, 0, 0, 0.1))",
         }}
@@ -229,7 +229,7 @@ export default function Playground({ onConnect }: PlaygroundProps) {
       (!agentAudioTrack && roomState === ConnectionState.Connected);
 
     const apiKeyInputSection = (
-      <div className="fixed bottom-2 md:bottom-auto md:absolute left-1/2 md:top-1/2 -translate-y-1/2 -translate-x-1/2 w-11/12 md:w-96 text-center">
+      <div className="absolute left-1/2 top-32 md:top-1/2 -translate-y-1/2 -translate-x-1/2 w-11/12 md:w-96 text-center">
         <motion.div
           className="flex flex-col gap-3"
           initial={{
@@ -259,7 +259,7 @@ export default function Playground({ onConnect }: PlaygroundProps) {
     );
 
     const startConversationButton = (
-      <div className="fixed bottom-2 md:bottom-auto md:absolute left-1/2 md:top-1/2 -translate-y-1/2 -translate-x-1/2 w-11/12 md:w-96 text-center">
+      <div className="absolute left-1/2 top-32 md:top-1/2 -translate-y-1/2 -translate-x-1/2 w-11/12 md:w-96 text-center">
         <motion.div
           className="flex flex-col gap-3"
           initial={{
@@ -328,7 +328,7 @@ export default function Playground({ onConnect }: PlaygroundProps) {
             </div>
           </div>
         )}
-        <div className="flex items-center">
+        <div className="flex items-center justify-center w-full">
           <GroqAudioVisualizer
             state={
               roomState === ConnectionState.Disconnected

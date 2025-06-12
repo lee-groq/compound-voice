@@ -87,9 +87,9 @@ export const APIKeyInput = ({ onApiKeySubmit, isLoading, apiError }: APIKeyInput
           <LoadingSVG diameter={24} strokeWidth={4} />
         </div>
       </Button>
-      <div className="text-xs text-gray-500 text-center mt-1">
+      {/* <div className="text-xs text-gray-500 text-center mt-1">
         Your API key is sent securely to the backend and never stored in the browser.
-      </div>
+      </div> */}
     </div>
   );
 };

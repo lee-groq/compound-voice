@@ -101,7 +101,6 @@ export const MicrophoneButton = ({
             }
           `}>
             <AgentMultibandAudioVisualizer
-              state="speaking"
               barWidth={3}
               minBarHeight={4}
               maxBarHeight={20}

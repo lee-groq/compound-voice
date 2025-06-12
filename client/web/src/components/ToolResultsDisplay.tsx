@@ -312,7 +312,7 @@ const ToolResultsDisplay: React.FC<ToolResultsDisplayProps> = ({ results, onClos
   };
 
   return (
-    <div className="animate-in slide-in-from-right duration-500">
+    <div className="animate-in slide-in-from-right lg:slide-in-from-right slide-in-from-bottom duration-500 relative z-50">
       {/* Modern Header with Close Button */}
       <div className="mb-4 flex items-center justify-between">
         <div>
@@ -338,8 +338,8 @@ const ToolResultsDisplay: React.FC<ToolResultsDisplayProps> = ({ results, onClos
       </div>
 
       {/* Modern Tab Navigation */}
-      <div className="bg-white rounded-xl shadow-lg border border-groq-accent-border overflow-hidden">
-        <div className="flex overflow-x-auto bg-groq-neutral-bg border-b border-groq-accent-border">
+      <div className="bg-white rounded-xl shadow-lg border border-groq-accent-border overflow-hidden mb-4 lg:mb-0">
+        <div className="flex overflow-x-auto bg-groq-neutral-bg border-b border-groq-accent-border scrollbar-hide">
           {results.map((result, index) => {
             const isActive = activeTab === index;
             
@@ -348,7 +348,7 @@ const ToolResultsDisplay: React.FC<ToolResultsDisplayProps> = ({ results, onClos
                 key={index}
                 onClick={() => setActiveTab(index)}
                 className={`
-                  flex items-center gap-3 px-6 py-4 text-sm font-medium transition-all duration-200 relative flex-shrink-0 min-w-0
+                  flex items-center gap-2 lg:gap-3 px-3 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-medium transition-all duration-200 relative flex-shrink-0 min-w-0
                   ${isActive 
                     ? 'bg-white text-groq-content-text border-b-2 border-groq-action-text shadow-sm' 
                     : 'text-groq-accent-text hover:text-groq-content-text hover:bg-white/50'
@@ -377,7 +377,7 @@ const ToolResultsDisplay: React.FC<ToolResultsDisplayProps> = ({ results, onClos
                 </div>
                 
                 {/* Title with truncation */}
-                <span className="truncate max-w-[200px]">
+                <span className="truncate max-w-[120px] lg:max-w-[200px]">
                   {result.title}
                 </span>
                 
@@ -407,7 +407,7 @@ const ToolResultsDisplay: React.FC<ToolResultsDisplayProps> = ({ results, onClos
         </div>
         
         {/* Content Area */}
-        <div className="bg-white min-h-[400px] transition-all duration-300">
+        <div className="bg-white min-h-[300px] lg:min-h-[400px] transition-all duration-300">
           {renderPreviewContent(results[activeTab], activeTab)}
         </div>
       </div>

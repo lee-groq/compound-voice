@@ -99,8 +99,10 @@ export function HomeInner() {
 
   const hasToolResults = toolResults.length > 0;
 
-  return (
-    <>
+
+
+    return (
+    <div className="min-h-screen flex flex-col">
       <Head>
         <title>Groq + LiveKit Compound-beta Voice Assistant Demo</title>
         <meta
@@ -137,8 +139,7 @@ export function HomeInner() {
       <PlaygroundHeader height={56} />
       
       <main
-        className={`relative flex overflow-x-hidden w-full bg-groq-neutral-bg repeating-square-background ${hasToolResults ? 'flex-row' : 'flex-col justify-center items-center'}`}
-        style={{ height: 'calc(100vh - 56px - 48px)' }}
+        className={`relative flex overflow-x-hidden w-full bg-groq-neutral-bg repeating-square-background flex-1 ${hasToolResults ? 'flex-col lg:flex-row' : 'flex-col justify-center items-center'}`}
       >
         <AnimatePresence>
           {toastMessage && (
@@ -160,19 +161,30 @@ export function HomeInner() {
         </AnimatePresence>
         
         {/* --- Test Mode Controls --- */}
-        {process.env.NODE_ENV === 'development' && (
+        {/* {process.env.NODE_ENV === 'development' && (
           <div style={{ position: 'absolute', top: '10px', right: hasToolResults ? 'calc(50% + 10px)' : '10px', zIndex: 100, background: 'rgba(255,255,255,0.8)', padding: '10px', borderRadius: '5px', transition: 'right 0.3s ease-in-out' }}>
             <h5 style={{marginTop: 0, marginBottom: '5px'}}>Test Controls</h5>
             <button onClick={handleLoadTestResults} style={{ marginRight: '5px', padding: '5px' }}>Load Test URLs</button>
             <button onClick={handleClearTestResults} style={{ padding: '5px' }}>Clear URLs</button>
           </div>
-        )}
+        )} */}
         {/* --- End Test Mode Controls --- */}
 
-        {/* Main content area (left side when tool results are shown) */}
-        <div className={`flex flex-col justify-center items-center h-full ${hasToolResults ? 'w-1/2' : 'w-full'}`}>
+        {/* Main content area (full width on mobile, left side on desktop when tool results are shown) */}
+        <div className={`flex flex-col justify-center items-center ${hasToolResults ? 'w-full lg:w-1/2 h-auto lg:h-full py-4 lg:py-0' : 'w-full'}`}>
           {/* Pass setToolResults to RoomComponent */}
-          <RoomComponent onToolResults={setToolResults} />
+          <RoomComponent onToolResults={(results) => {
+            setToolResults(results);
+            // Auto-scroll to tool results on mobile when they appear
+            if (results.length > 0) {
+              setTimeout(() => {
+                const toolResultsElement = document.getElementById('tool-results-container');
+                if (toolResultsElement && window.innerWidth < 1024) { // lg breakpoint
+                  toolResultsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }, 100);
+            }
+          }} />
 
           {/* Display general errors (e.g., configuration issues) */}
           {error && (
@@ -182,9 +194,13 @@ export function HomeInner() {
           )}
         </div>
 
-        {/* Tool results area (right side, shown only if there are results) */}
+        {/* Tool results area (full width on mobile, right side on desktop) */}
         {hasToolResults && (
-          <div className="w-1/2 h-full overflow-y-auto p-4">
+          <div 
+            id="tool-results-container"
+            className="w-full lg:w-1/2 h-auto lg:h-full overflow-y-auto p-4 pt-8 lg:pt-4 z-50 relative"
+            style={{ minHeight: '60vh' }}
+          >
             <ToolResultsDisplay 
               results={toolResults} 
               onClose={() => setToolResults([])}
@@ -194,8 +210,8 @@ export function HomeInner() {
 
       </main>
 
-      {/* GitHub Footer*/}
-      <footer className="h-12 pb-2 bg-groq-neutral-bg flex items-center justify-center">
+      {/* GitHub Footer */}
+      <footer className="h-12 bg-groq-neutral-bg flex items-center justify-center flex-shrink-0">
         <a
           href="https://github.com/lee-groq/compound-voice"
           className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors cursor-pointer"
@@ -206,6 +222,6 @@ export function HomeInner() {
           GitHub Repository
         </a>
       </footer>
-    </>
+    </div>
   );
 }
