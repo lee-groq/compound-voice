@@ -231,32 +231,43 @@ class CustomGroqLLM(LLM):
 
     def _convert_messages(self, chat_ctx: ChatContext):
         """
-        Convert ChatContext items to Groq format.
+        Convert ChatContext items to Groq format, filtering out invalid messages (such as empty messages).
         """
         converted = []
         
         # Access items from ChatContext instead of messages
         for item in chat_ctx.items:
-            # Each item is a ChatMessage with role and content
-            if hasattr(item, 'role') and hasattr(item, 'content'):
-                # Handle content properly - it might be a list or string
-                content = item.content
-                if isinstance(content, list):
-                    # If content is a list, extract text content
-                    text_content = ""
-                    for content_item in content:
-                        if hasattr(content_item, 'text'):
-                            text_content += content_item.text
-                        elif isinstance(content_item, str):
-                            text_content += content_item
-                    content = text_content
-                elif hasattr(content, 'text'):
-                    content = content.text
-                
-                converted.append({
-                    "role": item.role,
-                    "content": str(content) if content else ""
-                })
+            if not (hasattr(item, 'role') and hasattr(item, 'content')):
+                continue
+
+            role = str(item.role)
+            content_obj = item.content
+            
+            final_content = ""
+            if isinstance(content_obj, str):
+                final_content = content_obj
+            elif hasattr(content_obj, 'text'):
+                final_content = str(content_obj.text)
+            elif isinstance(content_obj, list):
+                text_parts = []
+                for part in content_obj:
+                    if isinstance(part, str):
+                        text_parts.append(part)
+                    elif hasattr(part, 'text'):
+                        text_parts.append(str(part.text))
+                final_content = "".join(text_parts)
+            elif content_obj is not None:
+                final_content = str(content_obj)
+
+            # Skip messages with no content (ie the agent determined it didn't need to respond), which Groq's API rejects.
+            if not final_content or not final_content.strip():
+                print(f"[DEBUG] Skipping message with empty content from role: {role}")
+                continue
+
+            converted.append({
+                "role": role,
+                "content": final_content
+            })
         
         return converted
 
