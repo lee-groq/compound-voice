@@ -5,8 +5,8 @@ A compound AI voice assistant using [Compound-beta](https://console.groq.com/doc
 
 ## Quickstart
 
-### Hosted on Google Cloud:
-To use Compound Voice, you can use the hosted version at **INSERT LINK HERE**
+### Hosted:
+To use Compound Voice, you can visit the hosted version [here](https://compound-voice-frontend.vercel.app/)
 
 ### Run locally:
 Alternatively, you can run Compound Voice locally. 
