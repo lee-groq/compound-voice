@@ -14,11 +14,19 @@ export const APIKeyInput = ({ onApiKeySubmit, isLoading, apiError }: APIKeyInput
   const [apiKey, setApiKey] = useState<string>("");
   const [isValid, setIsValid] = useState<boolean>(false);
   const [showKey, setShowKey] = useState<boolean>(false);
+  const [showError, setShowError] = useState<boolean>(true);
   
   // Basic validation - checks if input is not empty and meets minimum length
   useEffect(() => {
     setIsValid(apiKey.trim().length >= 8);
   }, [apiKey]);
+
+  // Show error when apiError prop changes
+  useEffect(() => {
+    if (apiError) {
+      setShowError(true);
+    }
+  }, [apiError]);
 
   const handleSubmit = () => {
     if (isValid && !isLoading) {
@@ -38,11 +46,12 @@ export const APIKeyInput = ({ onApiKeySubmit, isLoading, apiError }: APIKeyInput
             type={showKey ? "text" : "password"}
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
+            onFocus={() => setShowError(false)}
             placeholder="gsk_..."
             disabled={isLoading}
             className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cartesia-500 pr-10 ${
               isLoading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            } ${apiError && showError ? "border-red-300 focus:ring-red-500" : ""}`}
           />
           <button
             type="button"
@@ -63,12 +72,18 @@ export const APIKeyInput = ({ onApiKeySubmit, isLoading, apiError }: APIKeyInput
               </svg>
             )}
           </button>
+          {apiError && showError && (
+            <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-red-600 text-white text-sm p-3 rounded-md shadow-lg border border-red-700 animate-in fade-in slide-in-from-top-1 duration-200">
+              <div className="flex items-start gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 mt-0.5 flex-shrink-0">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+                <span>{apiError}</span>
+              </div>
+              <div className="absolute -top-1 left-4 w-2 h-2 bg-red-600 border-l border-t border-red-700 transform rotate-45"></div>
+            </div>
+          )}
         </div>
-        {apiError && (
-          <div className="text-red-600 text-sm mt-1 bg-red-50 p-2 rounded border border-red-200">
-            {apiError}
-          </div>
-        )}
                   <div className="text-xs text-gray-500 text-left">
             Don&apos;t have an API key? <a href="https://console.groq.com/home" target="_blank" className="text-groq-button-text hover:text-groq-accent-text-active">Create one here</a>
           </div>
