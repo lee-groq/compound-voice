@@ -47,20 +47,8 @@ export const APIKeyInput = ({ onApiKeySubmit, isLoading, apiError }: APIKeyInput
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
             onFocus={() => setShowError(false)}
-            onPaste={(e) => {
-              // Ensure paste works on mobile by explicitly handling the event
-              const pastedText = e.clipboardData?.getData('text') || '';
-              if (pastedText) {
-                setApiKey(pastedText);
-                setShowError(false);
-              }
-            }}
             placeholder="gsk_..."
             disabled={isLoading}
-            autoComplete="off"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck="false"
             className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cartesia-500 pr-10 ${
               isLoading ? "opacity-50 cursor-not-allowed" : ""
             } ${apiError && showError ? "border-red-300 focus:ring-red-500" : ""}`}

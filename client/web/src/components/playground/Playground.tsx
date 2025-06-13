@@ -113,21 +113,19 @@ export default function Playground({ onConnect }: PlaygroundProps) {
         throw new Error("Invalid Groq API key format. It should start with 'gsk_'");
       }
       
-      // Validate the API key by making a test call to Groq
-      const response = await fetch("https://api.groq.com/openai/v1/models", {
-        method: "GET",
+      // Validate the API key via server-side API route
+      const response = await fetch("/api/validate-groq-key", {
+        method: "POST",
         headers: {
-          "Authorization": `Bearer ${key.trim()}`,
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ apiKey: key.trim() }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error("Invalid API key. Please check your Groq API key and try again.");
-        } else {
-          throw new Error(`API validation failed: ${response.status} ${response.statusText}`);
-        }
+        throw new Error(data.error || `Validation failed: ${response.status}`);
       }
       
       console.log("API key validated successfully");
