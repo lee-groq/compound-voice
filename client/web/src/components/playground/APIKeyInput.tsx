@@ -27,7 +27,7 @@ export const APIKeyInput = ({ onApiKeySubmit, isLoading, apiError }: APIKeyInput
   };
 
   return (
-    <div className="w-full flex flex-col gap-3">
+    <div className="w-full flex flex-col gap-3 lg:mt-24">
       <div className="flex flex-col gap-1 mb-3">
         <label htmlFor="api-key" className="text-sm text-gray-600 text-left">
           Groq API Key
