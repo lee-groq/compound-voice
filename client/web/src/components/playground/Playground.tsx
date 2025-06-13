@@ -250,9 +250,9 @@ export default function Playground({ onConnect }: PlaygroundProps) {
             damping: 20,
           }}
         >
-          <div className="text-center text-base text-gray-700 mb-2">
+          {/* <div className="text-center text-base text-gray-700 mb-2">
             Please enter your Groq API key to continue
-          </div>
+          </div> */}
           <APIKeyInput onApiKeySubmit={handleApiKeySubmit} isLoading={isApiKeyLoading} apiError={apiKeyError} />
         </motion.div>
       </div>
@@ -314,9 +314,9 @@ export default function Playground({ onConnect }: PlaygroundProps) {
     );
 
     const visualizerContent = (
-      <div className="flex flex-col items-center justify-space-between w-full pb-12">
+      <div className="flex flex-col items-center justify-space-between w-full">
         {roomState === ConnectionState.Disconnected && (
-          <div className="w-full text-center mb-4 px-4">
+          <div className="w-full text-center mb-4 px-4 mt-8">
             <div className="inline-block text-left">
               <p className="text-sm text-gray-500">
                 Project:
@@ -328,7 +328,7 @@ export default function Playground({ onConnect }: PlaygroundProps) {
             </div>
           </div>
         )}
-        <div className="flex items-center justify-center w-full">
+        <div className="flex items-center justify-center w-full -mt-16">
           <GroqAudioVisualizer
             state={
               roomState === ConnectionState.Disconnected
@@ -398,7 +398,7 @@ export default function Playground({ onConnect }: PlaygroundProps) {
           )}
         </AnimatePresence>
 
-        <div className="min-h-20 w-full relative">
+        <div className="w-full relative">
           <AnimatePresence>
             {roomState === ConnectionState.Disconnected && !apiKey && !agentAudioTrack ? apiKeyInputSection : null}
             {roomState === ConnectionState.Disconnected && apiKey && !agentAudioTrack ? startConversationButton : null}

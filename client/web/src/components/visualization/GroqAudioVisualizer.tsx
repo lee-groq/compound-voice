@@ -25,6 +25,7 @@ export const GroqAudioVisualizer = ({
   frequencies,
 }: GroqAudioVisualizerProps) => {
   const [isTabletOrSmaller, setIsTabletOrSmaller] = useState(false);
+  const [isMobileSmall, setIsMobileSmall] = useState(false);
   const summedFrequencies = frequencies.map((bandFrequencies) => {
     const sum = (bandFrequencies as number[]).reduce((a, b) => a + b, 0);
     return Math.sqrt(sum / bandFrequencies.length);
@@ -33,12 +34,29 @@ export const GroqAudioVisualizer = ({
   useEffect(() => {
     const handleResize = () => {
       setIsTabletOrSmaller(window.innerWidth < 1024);
+      // iPhone 12 Pro is 390px wide, so we target screens 400px and below for extra safety
+      setIsMobileSmall(window.innerWidth <= 400);
     };
 
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Calculate radiusBase to ensure total width stays within 350px for small mobile devices
+  const getRadiusBase = () => {
+    if (isMobileSmall) {
+      // For 350px total width: 350 = radiusBase * 2 + 15 + 3 * 50
+      // 350 = radiusBase * 2 + 165
+      // radiusBase * 2 = 185
+      // radiusBase = 92.5, round down to 90 for safety
+      return 90;
+    } else if (isTabletOrSmaller) {
+      return 110;
+    } else {
+      return 200;
+    }
+  };
 
   return (
     <div className="relative flex items-center justify-center w-full">
@@ -47,7 +65,7 @@ export const GroqAudioVisualizer = ({
           state={state}
           values={[90, 110, 120, 90]}
           frequencies={summedFrequencies.slice(0, 4)}
-          radiusBase={isTabletOrSmaller ? 110 : 200}
+          radiusBase={getRadiusBase()}
         />
       </div>
     </div>

@@ -139,7 +139,7 @@ export function HomeInner() {
       <PlaygroundHeader height={56} />
       
       <main
-        className={`relative flex overflow-x-hidden w-full bg-groq-neutral-bg repeating-square-background flex-1 ${hasToolResults ? 'flex-col lg:flex-row' : 'flex-col justify-center items-center'}`}
+        className={`relative flex overflow-x-hidden w-full bg-groq-neutral-bg repeating-square-background flex-1 ${hasToolResults ? 'flex-col lg:flex-row' : 'flex-col items-center'}`}
       >
         <AnimatePresence>
           {toastMessage && (
