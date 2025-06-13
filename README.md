@@ -5,7 +5,7 @@ A compound AI voice assistant using [Compound-beta](https://console.groq.com/doc
 
 ## Quickstart
 
-### Hosted:
+### Hosted on Google Cloud:
 To use Compound Voice, you can visit the hosted version [here](https://compound-voice-frontend.vercel.app/)
 
 ### Run locally:
@@ -92,13 +92,11 @@ LiveKit agents don't expose their own HTTP ports or URLs locally. Everything is 
 Create one GCP service for the agent and one GCP service for the frontend. Then, build and push the Docker images:
 
 ```bash
-cd agent  
 docker build -t us-west1-docker.pkg.dev/<YOUR_GCP_PROJECT_ID>/<YOUR_GCP_REPOSITORY>/<YOUR_AGENT_SERVICE_NAME>:latest -f agent/Dockerfile.agent --platform linux/amd64 ./agent
 
 docker push us-west1-docker.pkg.dev/<YOUR_GCP_PROJECT_ID>/<YOUR_GCP_REPOSITORY>/<YOUR_AGENT_SERVICE_NAME>:latest
 ```
 ```bash
-cd client/web
 docker build --build-arg NEXT_PUBLIC_LIVEKIT_URL=wss://your-livekit-url.com -t us-west1-docker.pkg.dev/<YOUR_GCP_PROJECT_ID>/<YOUR_GCP_REPOSITORY>/<YOUR_FRONTEND_SERVICE_NAME>:latest -f client/web/Dockerfile --platform linux/amd64 ./client/web
 
 docker push us-west1-docker.pkg.dev/<YOUR_GCP_PROJECT_ID>/<YOUR_GCP_REPOSITORY>/<YOUR_FRONTEND_SERVICE_NAME>:latest
